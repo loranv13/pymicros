@@ -1,4 +1,3 @@
-import mservice.service
 from mservice.service import service
 
 if '__name__' == "__main__":
