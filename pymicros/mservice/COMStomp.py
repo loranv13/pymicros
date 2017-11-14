@@ -1,10 +1,28 @@
 import stomp
 import sys
 
+#
+#
+#
+class COMPStompListener(stomp.ConnectionListener):
+    ''' '''
+    def __init__(self, *args, **kwargs):
+        ''' '''
+        super(msListener, self).__init__(*args, **kwargs)
 
+    def on_error(self, headers, message):
+        print('received an error "%s"' % message)
+
+    def on_message(self, headers, message):
+        ''' '''
+
+
+
+#
+#
+#
 class COMStomp:
     ''' '''
-
     def __init__(self, hosts, port, topic, queue, evt, monit, management):
         ''' '''
         self.HOSTS           = hosts
