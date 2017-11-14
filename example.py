@@ -1,4 +1,4 @@
-from mservice.service import service
+from pymicros.mservice.service import service
 
 if '__name__' == "__main__":
 
