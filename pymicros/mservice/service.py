@@ -5,7 +5,7 @@ import os
 import sys
 
 class service:
-''' '''
+    ''' '''
 
     def __init__(self,fileConf='./etc/defaults.cfg'):
         ''' '''
