@@ -1,8 +1,9 @@
 
-
+import uuid
 import configparser
 import os
 import sys
+from pymicros.mservice.COMStomp import COMStomp
 
 class service:
     ''' '''
@@ -16,36 +17,42 @@ class service:
         self.FILE_ID         = './filegen/.id_srv'
         # case restart. Return the ID save in the file
         if ( os.path.isfile(self.FILE_ID) ):
-            fichier = open(self.FILE_ID, "r")
-            self.MS_ID = fichier.readline()
-            fichier.close()
-            self.sendMonit()
+            f = open(self.FILE_ID, "r")
+            self.MS_ID = f.readline()
         # case first start. We generate the UUID
         else:
             self.MS_ID = str(uuid.uuid1());
-            fichier = open(self.FILE_ID, "w")
-            fichier.write(str(self.MS_ID))
-            fichier.close()
-            self.sendMonit()
+            f = open(self.FILE_ID, "w")
+            f.write(str(self.MS_ID))
+        f.close()
 
         #
         # Read the conf file
         #
         config = configparser.ConfigParser()
         config.readfp(open(fileConf))
-        # read fixe parameter
+        # -- read parameter
         self.MS_NAME         = config.get('administration','service_name')
         self.MS_JOB          = config.get('functional','class')
         self.MS_MODULE_JOB   = config.get('functional','module')
-        # read configuration
-        interfaces           = config.get('administration','interfaces')
+        # -- read configuration
+        #-
+        interfaces           = config.get('administration','interfaces').split(',')
         for interface in interfaces:
-            if interface == "STOMP":
-                self.STOMP_HOST = config.get('stomp','host')
-                self.STOMP_PORT = config.get('stomp','port')
+            if interface == "stomp":
+                self.stomp_connexion = COMStomp(config.get('stomp','host'),\
+                                                config.get('stomp','port'),\
+                                                config.get('stomp','b2b_topic'),\
+                                                config.get('stomp','b2b_queue'),\
+                                                config.get('stomp','b2b_topic_evt'),\
+                                                config.get('stomp','monitorring'),\
+                                                config.get('stomp','management'))
+            if interface == "ws":
+                self.WS_PORT = config.get('ws','port')
 
 
     def info(self):
         ''' '''
-        sys.stdout.write("HOST...: "+self.STOMP_HOST+"\n")
+        sys.stdout.write("Service Name...: "+self.MS_NAME+"\n")
+        sys.stdout.write("Service ID.....: "+self.MS_ID+"\n")
         sys.stdout.flush()
