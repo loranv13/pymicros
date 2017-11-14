@@ -1,5 +1,5 @@
 import stomp
-
+import sys
 
 
 class COMStomp:
@@ -7,7 +7,6 @@ class COMStomp:
 
     def __init__(self, hosts, port, topic, queue, evt, monit, management):
         ''' '''
-
         self.HOSTS           = hosts
         self.PORT            = port
         self.MONITORRING     = monit
@@ -15,7 +14,6 @@ class COMStomp:
         self.MS_TOPIC        = topic
         self.MS_QUEUE        = queue
         self.MS_EVT_PUBLISH  = evt
-
 
 
     def connexion(self):

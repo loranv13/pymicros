@@ -27,7 +27,7 @@ class service:
         f.close()
 
         #
-        # Read the conf file
+        # Read the user conf file
         #
         config = configparser.ConfigParser()
         config.readfp(open(fileConf))
