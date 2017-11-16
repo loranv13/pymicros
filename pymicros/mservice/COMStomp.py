@@ -10,7 +10,7 @@ class COMPStompListener(stomp.ConnectionListener):
     ''' '''
     def __init__(self, *args, **kwargs):
         ''' '''
-        super(msListener, self).__init__(*args, **kwargs)
+        super(COMPStompListener, self).__init__(*args, **kwargs)
 
     def on_heartbeat_timeout(self):
         ''' '''
@@ -46,10 +46,18 @@ class COMStomp:
             CONNEXION.append((h,self.PORT))
         try:
             self.AMQP_CONNEXION = stomp.Connection(host_and_ports=CONNEXION, keepalive=True, vhost=self.HOSTS, heartbeats=(0, 0))
+            sys.stdout.write("Stomp connection established...\n")
+            sys.stdout.flush()
         except Exception:
             _, e, _ = sys.exc_info()
             sys.stdout.write("Unable to send heartbeat, due to: "+str(e))
             sys.stdout.flush()
+
+        self.listener = COMPStompListener()
+        self.AMQP_CONNEXION.set_listener('MS', self.listener) 
+        self.AMQP_CONNEXION.start() 
+        self.AMQP_CONNEXION.connect(username='',passcode='',wait=True)
+        self.AMQP_CONNEXION.subscribe(self.MS_QUEUE, id=121, ack='auto')
 
 
     def sendRR(self):
