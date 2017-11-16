@@ -43,9 +43,9 @@ class COMStomp:
         ''' '''
         CONNEXION = []
         for h in self.HOSTS.split(','):
-            CONNEXION.append((h,self.PORT_STOMP))
+            CONNEXION.append((h,self.PORT))
         try:
-            self.AMQP_CONNEXION = stomp.Connection(host_and_ports=CONNEXION, keepalive=True, vhost=self.HOST_STOMP, heartbeats=(0, 0))
+            self.AMQP_CONNEXION = stomp.Connection(host_and_ports=CONNEXION, keepalive=True, vhost=self.HOSTS, heartbeats=(0, 0))
         except Exception:
             _, e, _ = sys.exc_info()
             sys.stdout.write("Unable to send heartbeat, due to: "+str(e))
