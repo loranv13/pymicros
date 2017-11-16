@@ -60,6 +60,7 @@ class service:
             if interface == "ws":
                 self.WS_PORT = config.get('ws','port')
 
+        self.loop()
 
     def info(self):
         ''' '''
@@ -67,3 +68,6 @@ class service:
         sys.stdout.write("Service ID.....: "+self.MS_ID+"\n")
         sys.stdout.write("PID MAIN.......: "+str(os.getpid())+"\n")
         sys.stdout.flush()
+
+    def loop(self):
+        self.stomp_connexion.loop()
