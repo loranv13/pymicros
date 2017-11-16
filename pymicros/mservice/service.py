@@ -55,6 +55,7 @@ class service:
                                                 config.get('stomp','b2b_topic_evt'),\
                                                 config.get('stomp','monitorring'),\
                                                 config.get('stomp','management'))
+                self.stomp_connexion.connexion()
                 self.stomp = self.executor.submit(self.stomp_connexion.loop)
 
             if interface == "ws":
