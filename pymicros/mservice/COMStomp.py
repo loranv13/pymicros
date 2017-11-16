@@ -1,5 +1,7 @@
 import stomp
 import sys
+import logging
+from time import sleep
 
 #
 #
@@ -9,6 +11,9 @@ class COMPStompListener(stomp.ConnectionListener):
     def __init__(self, *args, **kwargs):
         ''' '''
         super(msListener, self).__init__(*args, **kwargs)
+
+    def on_heartbeat_timeout(self):
+        ''' '''
 
     def on_error(self, headers, message):
         print('received an error "%s"' % message)
@@ -55,3 +60,8 @@ class COMStomp:
 
     def sendMonit(self):
         ''' '''
+
+    def lopp(self):
+        ''' '''
+        while self.AMQP_CONNEXION.is_connected():
+            sleep(1)

@@ -3,6 +3,7 @@ import uuid
 import configparser
 import os
 import sys
+import concurrent.futures
 from pymicros.mservice.COMStomp import COMStomp
 
 class service:
@@ -10,6 +11,10 @@ class service:
 
     def __init__(self,fileConf='./etc/defaults.cfg'):
         ''' '''
+
+        # Thread pool
+        self.executor = ThreadPoolExecutor(max_workers=5)
+
 
         #
         # identify if it's the first start
@@ -47,6 +52,8 @@ class service:
                                                 config.get('stomp','b2b_topic_evt'),\
                                                 config.get('stomp','monitorring'),\
                                                 config.get('stomp','management'))
+                self.stomp = self.executor.submit(self.stomp_connexion.loop)
+
             if interface == "ws":
                 self.WS_PORT = config.get('ws','port')
 
