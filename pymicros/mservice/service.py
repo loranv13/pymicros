@@ -63,4 +63,5 @@ class service:
         ''' '''
         sys.stdout.write("Service Name...: "+self.MS_NAME+"\n")
         sys.stdout.write("Service ID.....: "+self.MS_ID+"\n")
+        sys.stdout.write("PID MAIN.......: "+str(os.getpid())+"\n")
         sys.stdout.flush()

@@ -61,7 +61,7 @@ class COMStomp:
     def sendMonit(self):
         ''' '''
 
-    def lopp(self):
+    def loop(self):
         ''' '''
         while self.AMQP_CONNEXION.is_connected():
             sleep(1)
