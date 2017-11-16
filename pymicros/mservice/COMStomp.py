@@ -42,7 +42,7 @@ class COMStomp:
     def connexion(self):
         ''' '''
         CONNEXION = []
-        for h in self.HOST_STOMP.split(','):
+        for h in self.HOSTS.split(','):
             CONNEXION.append((h,self.PORT_STOMP))
         try:
             self.AMQP_CONNEXION = stomp.Connection(host_and_ports=CONNEXION, keepalive=True, vhost=self.HOST_STOMP, heartbeats=(0, 0))
