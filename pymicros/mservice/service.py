@@ -61,7 +61,7 @@ class service:
             if interface == "ws":
                 self.WS_PORT = config.get('ws','port')
 
-        self.loop()
+
 
     def info(self):
         ''' '''
@@ -71,4 +71,5 @@ class service:
         sys.stdout.flush()
 
     def loop(self):
-        self.stomp_connexion.loop()
+        while 1:
+            sleep(1)
