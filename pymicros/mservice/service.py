@@ -46,6 +46,8 @@ class service:
         interfaces           = config.get('administration','interfaces').split(',')
         for interface in interfaces:
             if interface == "stomp":
+                sys.stdout.write("INT STOMP.......: start\n")
+                sys.stdout.flush()
                 self.stomp_connexion = COMStomp(config.get('stomp','host'),\
                                                 config.get('stomp','port'),\
                                                 config.get('stomp','b2b_topic'),\
