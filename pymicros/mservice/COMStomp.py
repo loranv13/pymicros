@@ -2,6 +2,8 @@ import stomp
 import sys
 import logging
 from time import sleep
+from threading import Thread, current_thread
+import pymicros.mservice.service
 
 #
 #
@@ -20,6 +22,9 @@ class COMPStompListener(stomp.ConnectionListener):
 
     def on_message(self, headers, message):
         ''' '''
+        pymicros.mservice.service.qrcv.put(message)
+        sys.stdout.write(current_thread().name+" : "+message+"\n") 
+        sys.stdout.flush()
 
 
 
@@ -48,10 +53,12 @@ class COMStomp:
             self.AMQP_CONNEXION = stomp.Connection(host_and_ports=CONNEXION, keepalive=True, vhost=self.HOSTS, heartbeats=(0, 0))
             sys.stdout.write("Stomp connection established...\n")
             sys.stdout.flush()
-        except Exception:
+        except ConnectionRefusedError:
             _, e, _ = sys.exc_info()
             sys.stdout.write("Unable to send heartbeat, due to: "+str(e))
             sys.stdout.flush()
+        except exception.ConnectionRefusedError:
+            pass
 
         self.listener = COMPStompListener()
         self.AMQP_CONNEXION.set_listener('MS', self.listener) 

@@ -1,5 +1,3 @@
-
-import uuid
 import configparser
 import os
 import sys
@@ -7,12 +5,18 @@ from time import sleep
 import concurrent.futures
 from concurrent.futures import ThreadPoolExecutor
 from pymicros.mservice.COMStomp import COMStomp
+from threading import current_thread 
+import queue
+
+qrcv = queue.Queue()
 
 class service:
     ''' '''
 
     def __init__(self,fileConf='./etc/defaults.cfg'):
         ''' '''
+        #
+        self.bloop 	= True
 
         # Thread pool
         self.executor = ThreadPoolExecutor(max_workers=5)
@@ -56,6 +60,7 @@ class service:
                                                 config.get('stomp','monitorring'),\
                                                 config.get('stomp','management'))
                 self.stomp_connexion.connexion()
+                #Start loop thread listen incoming message 
                 self.stomp = self.executor.submit(self.stomp_connexion.loop)
 
             if interface == "ws":
@@ -68,8 +73,11 @@ class service:
         sys.stdout.write("Service Name...: "+self.MS_NAME+"\n")
         sys.stdout.write("Service ID.....: "+self.MS_ID+"\n")
         sys.stdout.write("PID MAIN.......: "+str(os.getpid())+"\n")
+        sys.stdout.write("Main Thread....: "+current_thread().name+"\n")
         sys.stdout.flush()
 
     def loop(self):
-        while 1:
-            sleep(1)
+        global q
+        while self.bloop:
+            while not qrcv.empty():
+                print(current_thread().name+" received message: "+q.get()+"\n")
