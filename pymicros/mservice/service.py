@@ -81,11 +81,11 @@ class service:
                 self.executor.submit(self.ws_connexion.listen)
                 
         # -- Read conf zkp
-        self.zk = zkp(config.get('zkp','ip'), config.get('zkp','port'))
+        self.zk = zkp(config.get('zkp','ip'), config.get('zkp','port'), config.get('dependances','services'))
         s = "['ip':'"+self.WS_IP+"','port':'"+self.WS_PORT+"']"
         self.zk.register(self.MS_NAME, self.MS_ID, s)
 	# -- get liste service dependency
-        self.zk.treeService(config.get('dependances','services'))
+        self.zk.treeService()
 
 
     def info(self):
