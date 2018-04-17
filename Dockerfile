@@ -3,6 +3,7 @@ FROM python:latest
 RUN apt-get update
 
 RUN pip3 install stomp.py
+RUN pip3 install kazoo
 
 RUN mkdir /micro/
 RUN mkdir /micro/etc/

@@ -1,12 +1,20 @@
 import configparser
+import signal
 import os
 import sys
 from time import sleep
 import concurrent.futures
 from concurrent.futures import ThreadPoolExecutor
 from pymicros.mservice.COMStomp import COMStomp
+from pymicros.mservice.COMWs import COMWs
+from pymicros.mservice.RegistryZKP import zkp
 from threading import current_thread 
 import queue
+from flask import Flask
+from kazoo.client import KazooClient
+import logging
+import uuid
+import time
 
 qrcv = queue.Queue()
 
@@ -15,8 +23,8 @@ class service:
 
     def __init__(self,fileConf='./etc/defaults.cfg'):
         ''' '''
+        #logging.basicConfig()
         #
-        self.bloop 	= True
 
         # Thread pool
         self.executor = ThreadPoolExecutor(max_workers=5)
@@ -51,7 +59,7 @@ class service:
         interfaces           = config.get('administration','interfaces').split(',')
         for interface in interfaces:
             if interface == "stomp":
-                sys.stdout.flush()
+                #sys.stdout.flush()
                 self.stomp_connexion = COMStomp(config.get('stomp','host'),\
                                                 config.get('stomp','port'),\
                                                 config.get('stomp','b2b_topic'),\
@@ -59,13 +67,25 @@ class service:
                                                 config.get('stomp','b2b_topic_evt'),\
                                                 config.get('stomp','monitorring'),\
                                                 config.get('stomp','management'))
-                self.stomp_connexion.connexion()
-                #Start loop thread listen incoming message 
-                self.stomp = self.executor.submit(self.stomp_connexion.loop)
+                self.info()
+                sys.stdout.write("Start thread Stomp from "+current_thread().name+"\n")
+                sys.stdout.flush()
+                self.stomp = self.executor.submit(self.stomp_connexion.connexion)
 
             if interface == "ws":
                 self.WS_PORT = config.get('ws','port')
-
+                self.WS_IP= config.get('ws','ip')
+                self.ws_connexion = COMWs(self.WS_IP, int(self.WS_PORT))
+                sys.stdout.write("Start thread WS from "+current_thread().name+"\n")
+                sys.stdout.flush()
+                self.executor.submit(self.ws_connexion.listen)
+                
+        # -- Read conf zkp
+        self.zk = zkp(config.get('zkp','ip'), config.get('zkp','port'))
+        s = "['ip':'"+self.WS_IP+"','port':'"+self.WS_PORT+"']"
+        self.zk.register(self.MS_NAME, self.MS_ID, s)
+	# -- get liste service dependency
+        self.zk.treeService(config.get('dependances','services'))
 
 
     def info(self):
@@ -76,8 +96,19 @@ class service:
         sys.stdout.write("Main Thread....: "+current_thread().name+"\n")
         sys.stdout.flush()
 
+    
     def loop(self):
-        global q
-        while self.bloop:
-            while not qrcv.empty():
-                print(current_thread().name+" received message: "+q.get()+"\n")
+        global qrcv
+        while True:
+            try: 
+                while not qrcv.empty():
+                    sys.stdout.write(" --- "+current_thread().name+" : "+qrcv.get()+" - "+str(time.time())+"\n")
+                    sys.stdout.flush()
+                sleep(0.1)
+            except KeyboardInterrupt:
+                self.zk.unregister(self.MS_NAME, self.MS_ID)
+                print("\n-----------------------Purge des queues...\n")
+                while not qrcv.empty():
+                    sys.stdout.write(" - "+str(time.time())+"\n")
+                    sys.stdout.flush()
+                sys.exit(0)

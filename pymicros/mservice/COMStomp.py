@@ -4,6 +4,7 @@ import logging
 from time import sleep
 from threading import Thread, current_thread
 import pymicros.mservice.service
+import time
 
 #
 #
@@ -22,9 +23,8 @@ class COMPStompListener(stomp.ConnectionListener):
 
     def on_message(self, headers, message):
         ''' '''
+        sys.stdout.write(current_thread().name+" : "+message+" - "+str(time.time()))
         pymicros.mservice.service.qrcv.put(message)
-        sys.stdout.write(current_thread().name+" : "+message+"\n") 
-        sys.stdout.flush()
 
 
 
