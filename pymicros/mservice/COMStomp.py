@@ -44,8 +44,6 @@ class COMStomp:
         self.MS_EVT_PUBLISH  = evt
 
 
-    def connexion(self):
-        ''' '''
         CONNEXION = []
         for h in self.HOSTS.split(','):
             CONNEXION.append((h,self.PORT))
@@ -60,24 +58,33 @@ class COMStomp:
         except exception.ConnectionRefusedError:
             pass
 
+        self.AMQP_CONNEXION.start()
+        self.AMQP_CONNEXION.connect(username='',passcode='',wait=True)
+
+
+
+    def connexion(self):
+        ''' '''
         self.listener = COMPStompListener()
         self.AMQP_CONNEXION.set_listener('MS', self.listener) 
-        self.AMQP_CONNEXION.start() 
-        self.AMQP_CONNEXION.connect(username='',passcode='',wait=True)
+        #self.AMQP_CONNEXION.start() 
+        #self.AMQP_CONNEXION.connect(username='',passcode='',wait=True)
         self.AMQP_CONNEXION.subscribe(self.MS_QUEUE, id=121, ack='auto')
+        self.AMQP_CONNEXION.subscribe(self.MS_TOPIC, id=122, ack='auto')
 
 
     def sendRR(self):
         ''' '''
 
-    def sendFF(self, rcpt, message):
+    def sendFF(self, rcv, message):
         ''' '''
-        try:
-            self.AMQP_CONNEXION.send(rcpt,message)
-        except Exception as e:
-            sys.stdout.write("Object(msService).send error / message: "+message+"\n")
-            sys.stdout.flush()
-            return 0
+        #try:
+        self.AMQP_CONNEXION.send(rcv,message)
+        '''except Exception as e:
+            _, e, _ = sys.exc_info()
+            sys.stdout.write(">>>> "+str(e)+"\n")
+            sys.stdout.flush()'''
+
 
     def loop(self):
         ''' '''

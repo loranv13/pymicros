@@ -74,7 +74,8 @@ class service:
                 self.info()
                 sys.stdout.write("Start thread Stomp from "+current_thread().name+"\n")
                 sys.stdout.flush()
-                self.stomp = self.executor.submit(self.stomp_connexion.connexion)
+                #self.stomp = self.executor.submit(self.stomp_connexion.connexion)
+                self.stomp_connexion.connexion()
                 registre = {'topic':config.get('stomp','b2b_topic'),'queue': config.get('stomp','b2b_queue')}
                 zkp_registre['STOMP']= registre
 
