@@ -15,6 +15,7 @@ from kazoo.client import KazooClient
 import logging
 import uuid
 import time
+import json
 
 qrcv = queue.Queue()
 
@@ -23,6 +24,8 @@ class service:
 
     def __init__(self,fileConf='./etc/defaults.cfg'):
         ''' '''
+        registre ={}
+        zkp_registre={}
         #logging.basicConfig()
         #
 
@@ -54,6 +57,7 @@ class service:
         self.MS_NAME         = config.get('administration','service_name')
         self.MS_JOB          = config.get('functional','class')
         self.MS_MODULE_JOB   = config.get('functional','module')
+        self.MONIT	     = config.get('stomp','monitorring')
         # -- read configuration
         #-
         interfaces           = config.get('administration','interfaces').split(',')
@@ -71,6 +75,8 @@ class service:
                 sys.stdout.write("Start thread Stomp from "+current_thread().name+"\n")
                 sys.stdout.flush()
                 self.stomp = self.executor.submit(self.stomp_connexion.connexion)
+                registre = {'topic':config.get('stomp','b2b_topic'),'queue': config.get('stomp','b2b_queue')}
+                zkp_registre['STOMP']= registre
 
             if interface == "ws":
                 self.WS_PORT = config.get('ws','port')
@@ -79,11 +85,12 @@ class service:
                 sys.stdout.write("Start thread WS from "+current_thread().name+"\n")
                 sys.stdout.flush()
                 self.executor.submit(self.ws_connexion.listen)
+                registre = {'ip':self.WS_IP,'port':self.WS_PORT}
+                zkp_registre['WS']= registre
                 
         # -- Read conf zkp
         self.zk = zkp(config.get('zkp','ip'), config.get('zkp','port'), config.get('dependances','services'))
-        s = "['ip':'"+self.WS_IP+"','port':'"+self.WS_PORT+"']"
-        self.zk.register(self.MS_NAME, self.MS_ID, s)
+        self.zk.register(self.MS_NAME, self.MS_ID, json.dumps(zkp_registre))
 	# -- get liste service dependency
         self.zk.treeService()
 
@@ -95,6 +102,7 @@ class service:
         sys.stdout.write("PID MAIN.......: "+str(os.getpid())+"\n")
         sys.stdout.write("Main Thread....: "+current_thread().name+"\n")
         sys.stdout.flush()
+        self.stomp_connexion.sendFF(self.MONIT, "{'service':'"+self.MS_NAME+"','id':'"+self.MS_ID+"','state':'start'}") 
 
     
     def loop(self):

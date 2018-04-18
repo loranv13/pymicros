@@ -70,11 +70,14 @@ class COMStomp:
     def sendRR(self):
         ''' '''
 
-    def sendFF(self):
+    def sendFF(self, rcpt, message):
         ''' '''
-
-    def sendMonit(self):
-        ''' '''
+        try:
+            self.AMQP_CONNEXION.send(rcpt,message)
+        except Exception as e:
+            sys.stdout.write("Object(msService).send error / message: "+message+"\n")
+            sys.stdout.flush()
+            return 0
 
     def loop(self):
         ''' '''
